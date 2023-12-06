@@ -1,0 +1,15 @@
+---
+
+- category: ansible
+  questions:
+    - question: How ansible communicate with external host?
+    - question: What's the command to run an ansible playbook?
+
+- category: terraform
+  questions:
+    - question: What's the lifecycle of a Terraform resources?
+    - question: How does Terraform \"remember\" if a resources was already created?
+
+- category: aws
+  questions:
+    - question: Can we shutdown and EC2 instance?
