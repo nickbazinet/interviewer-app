@@ -3,6 +3,7 @@ Minimalist application used to validate the knowledge of an applicant through va
 
 # Setup
 _Temporary until read from config file_
+
 Need to replace OpenAI API key in configRetriever.go
 
 # Development
