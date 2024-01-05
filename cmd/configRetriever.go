@@ -1,12 +1,12 @@
 package cmd
 
 import (
+	"os"
 	"fmt"
 	"log"
 	"errors"
 	"gopkg.in/yaml.v2"
 	"encoding/json"
-	"io/ioutil"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -29,7 +29,7 @@ func getCategory(impl string) ([]Category, error) {
 	switch impl {
 	case "local":
 
-		data, err := ioutil.ReadFile("./config/default.yml")
+		data, err := os.ReadFile("./config/default.yml")
 		if err != nil {
 			return nil, err
 		}
@@ -41,7 +41,7 @@ func getCategory(impl string) ([]Category, error) {
 
 	case "chatgpt":
 		
-		apiKey := "your-api-key"
+		apiKey := "replace-with-your-key"
 		client := resty.New()
 		response, err := client.R().
 			SetAuthToken(apiKey).
@@ -50,8 +50,8 @@ func getCategory(impl string) ([]Category, error) {
 				"model": "gpt-3.5-turbo",
 				"messages": []interface{}{map[string]interface{}{
 					"role":"system",
-					"content": "Hi can you tell me what is the factorial of 10?"}},
-				"max_tokens": 50,
+					"content": "You are an interviewer for an AWS Cloud DevOps engineer. You need to create 3 categories of questions with 3 questions each that can be ask to an candidate. The return format of the category and related questions needs to be in a yaml format. Do not include the answer, do not add any number after the field name 'question' and each questions are part of a list, and each category are part of a list."}},
+				"max_tokens": 500,
 			}).
 			Post(apiEndpoint)
 
@@ -67,12 +67,17 @@ func getCategory(impl string) ([]Category, error) {
 			fmt.Println("Error while decoding JSON response:", err)
 		}
 
-		content := data//["choices"].([]interface{})[0].(map[string]interface{})["message"].(map[string]interface{})["content"].(string)
-		fmt.Println(content)
+		content := data["choices"].([]interface{})[0].(map[string]interface{})["message"].(map[string]interface{})["content"].(string)
+		//fmt.Println(content)
+
+		err = yaml.Unmarshal([]byte(content), &categories)
+		if err != nil {
+			return nil, err
+		}
 
 
 	default:
-		return nil, errors.New(fmt.Sprintf(" Error: Invalide Implementation Type."))
+		return nil, errors.New("error invalide implementation type")
 
 	}
 	return categories, nil

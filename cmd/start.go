@@ -1,7 +1,3 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
@@ -11,6 +7,7 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 // startCmd represents the start command
@@ -26,13 +23,24 @@ to quickly create a Cobra application.`,
 	Run: start,
 }
 
+func getCategoryWorker(done chan []Category, p *tea.Program) {
+	categories, _ := getCategory("chatgpt")
+	done <- categories
+	p.Quit()
+}
+
 func start(cmd *cobra.Command, args []string) {
 	fmt.Println(welcomeMessage())
 
-	categories, _ := getCategory("chatgpt")
-	fmt.Println(categories)
+	p := tea.NewProgram(initialModel())
+	ch := make(chan []Category, 1)
+	go getCategoryWorker(ch, p)
+	
+	p.Run()
+
+	categories := <-ch
 	categoryPromptContent := promptContent{
-		fmt.Sprintf("What category should you be evaluated today?"),
+		"What category should you be evaluated today?",
 		"Please select a category.",
 		getCategoriesName(categories),
 	}
@@ -67,7 +75,7 @@ func getQuestions(categories []Category, categoryName string) ([]Question, error
 			return category.Questions, nil
 		}
 	}
-	return nil, errors.New(fmt.Sprintf(" Error: No Category match the given category name."))
+	return nil, fmt.Errorf("error: no category match the given category name: %s", categoryName)
 
 }
 
@@ -108,8 +116,6 @@ func promptGetInput(pc simplePromptContent) string {
         fmt.Printf("Prompt failed %v\n", err)
         os.Exit(1)
     }
-
-    fmt.Printf("Input: %s\n", result)
 
     return result
 }

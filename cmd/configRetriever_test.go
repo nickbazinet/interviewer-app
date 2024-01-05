@@ -3,7 +3,6 @@ package cmd
 
 import (
 	"testing"
-	"fmt"
 )
 
 func TestGetCategory(t *testing.T) {
@@ -16,7 +15,7 @@ func TestGetCategory(t *testing.T) {
 	}
 
 	if err != nil {
-		t.Error(fmt.Sprintf("Error was not null %s", err))
+		t.Errorf("Error was not null %s", err)
 	}
 
 
@@ -37,7 +36,7 @@ func TestGetCategory_chatgpt(t *testing.T) {
 	_, err := getCategory("chatgpt")
 
 	if err != nil {
-		t.Error(fmt.Sprintf("Error was not null %s", err))
+		t.Errorf("Error was not null %s", err)
 	}
 }
 
