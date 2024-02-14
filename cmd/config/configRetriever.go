@@ -1,4 +1,4 @@
-package cmd
+package config
 
 import (
 	"os"
@@ -24,7 +24,7 @@ type Category struct {
 	Questions []Question `yaml:"questions"`
 }
 
-func getCategory(impl string) ([]Category, error) {
+func GetCategory(impl string) ([]Category, error) {
 	var categories []Category
 	switch impl {
 	case "local":
@@ -41,7 +41,7 @@ func getCategory(impl string) ([]Category, error) {
 
 	case "chatgpt":
 		
-		apiKey := "replace-with-your-key"
+		apiKey := "replace-me"
 		client := resty.New()
 		response, err := client.R().
 			SetAuthToken(apiKey).

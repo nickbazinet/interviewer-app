@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/manifoldco/promptui"
-	"github.com/spf13/cobra"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/manifoldco/promptui"
+	"github.com/nickbazinet/interviewer-app/cmd/config"
+	"github.com/nickbazinet/interviewer-app/cmd/record"
+	"github.com/spf13/cobra"
 )
 
 // startCmd represents the start command
@@ -23,8 +25,8 @@ to quickly create a Cobra application.`,
 	Run: start,
 }
 
-func getCategoryWorker(done chan []Category, p *tea.Program) {
-	categories, _ := getCategory("chatgpt")
+func getCategoryWorker(done chan []config.Category, p *tea.Program) {
+	categories, _ := config.GetCategory("chatgpt")
 	done <- categories
 	p.Quit()
 }
@@ -33,7 +35,7 @@ func start(cmd *cobra.Command, args []string) {
 	fmt.Println(welcomeMessage())
 
 	p := tea.NewProgram(initialModel())
-	ch := make(chan []Category, 1)
+	ch := make(chan []config.Category, 1)
 	go getCategoryWorker(ch, p)
 	
 	p.Run()
@@ -56,12 +58,12 @@ func start(cmd *cobra.Command, args []string) {
 			question.Text,
 			"Please answer a question.",
 		}
-		 promptGetInput(wordPromptContent)
+		record.Register_answer(question.Text, promptGetInput(wordPromptContent))
 	}
 	
 }
 
-func getCategoriesName(categories []Category) []string {
+func getCategoriesName(categories []config.Category) []string {
 	var categoriesName []string
 	for _, category := range categories {
 		categoriesName = append(categoriesName, category.Name)
@@ -69,7 +71,7 @@ func getCategoriesName(categories []Category) []string {
 	return categoriesName
 }
 
-func getQuestions(categories []Category, categoryName string) ([]Question, error) {
+func getQuestions(categories []config.Category, categoryName string) ([]config.Question, error) {
 	for _, category := range categories {
 		if category.Name == categoryName {
 			return category.Questions, nil
